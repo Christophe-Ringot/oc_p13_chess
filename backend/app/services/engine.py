@@ -1,5 +1,6 @@
 import os
 import shutil
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeoutError
 from stockfish import Stockfish
 from app.config import settings
 
@@ -8,9 +9,10 @@ class EngineError(Exception):
 
 
 class EngineService:
-    def __init__(self, path=None, depth=None):
+    def __init__(self, path=None, depth=None, timeout=None):
         self.path = path or settings.stockfish_path
         self.depth = depth or settings.stockfish_depth
+        self.timeout = timeout if timeout is not None else settings.stockfish_timeout
 
     def _resolve_path(self):
         if os.path.isfile(self.path):
@@ -32,7 +34,7 @@ class EngineService:
                 f"Moteur Stockfish indisponible ({path}) : {exc}"
             ) from exc
 
-    def evaluate(self, fen):
+    def _run_evaluation(self, fen):
         engine = self._engine()
 
         if not engine.is_fen_valid(fen):
@@ -50,3 +52,15 @@ class EngineService:
             "depth": self.depth,
             "side_to_move": "white" if " w " in fen else "black",
         }
+
+    def evaluate(self, fen):
+        executor = ThreadPoolExecutor(max_workers=1)
+        future = executor.submit(self._run_evaluation, fen)
+        try:
+            return future.result(timeout=self.timeout)
+        except FutureTimeoutError as exc:
+            raise EngineError(
+                f"Analyse Stockfish trop longue (> {self.timeout}s)."
+            ) from exc
+        finally:
+            executor.shutdown(wait=False)

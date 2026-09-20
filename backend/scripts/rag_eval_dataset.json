@@ -1,0 +1,37 @@
+[
+  {"query": "Sicilian Defense", "opening": "Sicilian Defense"},
+  {"query": "Sicilian Defense: Najdorf Variation", "opening": "Sicilian Defense"},
+  {"query": "Sicilian Defense: Dragon Variation", "opening": "Sicilian Defense"},
+
+  {"query": "Queen's Gambit", "opening": "Queen's Gambit"},
+  {"query": "Queen's Gambit Declined", "opening": "Queen's Gambit"},
+  {"query": "Queen's Gambit Accepted", "opening": "Queen's Gambit"},
+
+  {"query": "Ruy Lopez", "opening": "Ruy Lopez"},
+  {"query": "Ruy Lopez: Berlin Defense", "opening": "Ruy Lopez"},
+  {"query": "Ruy Lopez: Morphy Defense", "opening": "Ruy Lopez"},
+
+  {"query": "Italian Game", "opening": "Italian Game"},
+  {"query": "Italian Game: Giuoco Piano", "opening": "Italian Game"},
+  {"query": "Italian Game: Two Knights Defense", "opening": "Italian Game"},
+
+  {"query": "French Defense", "opening": "French Defense"},
+  {"query": "French Defense: Advance Variation", "opening": "French Defense"},
+  {"query": "French Defense: Winawer Variation", "opening": "French Defense"},
+
+  {"query": "Caro-Kann Defense", "opening": "Caro-Kann Defense"},
+  {"query": "Caro-Kann Defense: Advance Variation", "opening": "Caro-Kann Defense"},
+  {"query": "Caro-Kann Defense: Classical Variation", "opening": "Caro-Kann Defense"},
+
+  {"query": "King's Indian Defense", "opening": "King's Indian Defense"},
+  {"query": "King's Indian Defense: Classical Variation", "opening": "King's Indian Defense"},
+  {"query": "King's Indian Defense: Samisch Variation", "opening": "King's Indian Defense"},
+
+  {"query": "English Opening", "opening": "English Opening"},
+  {"query": "English Opening: Symmetrical Variation", "opening": "English Opening"},
+  {"query": "English Opening: Reversed Sicilian", "opening": "English Opening"},
+
+  {"query": "Scandinavian Defense", "opening": "Scandinavian Defense"},
+  {"query": "Scandinavian Defense: Main Line", "opening": "Scandinavian Defense"},
+  {"query": "Scandinavian Defense: Modern Variation", "opening": "Scandinavian Defense"}
+]

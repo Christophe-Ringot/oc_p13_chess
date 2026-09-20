@@ -1,0 +1,294 @@
+<div class="flex w-full max-w-md flex-col gap-4">
+  <h2 class="text-lg font-semibold text-slate-900">
+    Recommandations de l'agent
+  </h2>
+
+  <section class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div class="mb-2 flex items-center justify-between">
+      <h3 class="text-sm font-semibold text-slate-900">Évaluation</h3>
+      <span class="text-[11px] font-medium uppercase tracking-wide text-slate-400"
+        >Source : Stockfish</span
+      >
+    </div>
+
+    @if (state.evaluation.loading) {
+      <div class="flex animate-pulse flex-col gap-2">
+        <div class="h-6 w-1/2 rounded bg-slate-200"></div>
+        <div class="h-8 w-2/3 rounded bg-slate-200"></div>
+      </div>
+    } @else if (state.evaluation.error) {
+      <div class="flex items-center justify-between gap-2">
+        <p class="text-sm text-red-600">{{ state.evaluation.error }}</p>
+        <button
+          type="button"
+          (click)="retry.emit()"
+          class="shrink-0 rounded-lg border border-red-300 bg-red-50 px-2 py-1 text-xs font-medium text-red-700 transition hover:bg-red-100"
+        >
+          Réessayer
+        </button>
+      </div>
+    } @else {
+      @if (state.evaluation.data; as evaluation) {
+        <div class="mb-2 flex items-baseline justify-between">
+          <span class="text-xl font-bold text-slate-900">
+            {{ scoreLabel(evaluation.score_type, evaluation.score) }}
+          </span>
+          <span class="text-xs text-slate-500">
+            Trait aux
+            {{ evaluation.side_to_move === "white" ? "blancs" : "noirs" }}
+          </span>
+        </div>
+        @if (evaluation.best_move) {
+          <button
+            type="button"
+            (click)="playMove.emit(evaluation.best_move!)"
+            class="rounded-lg border border-emerald-600 bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700 transition hover:bg-emerald-100"
+          >
+            Meilleur coup : {{ evaluation.best_move }}
+          </button>
+        }
+        <p class="mt-2 text-xs text-slate-500">
+          Profondeur d'analyse : {{ evaluation.depth }}
+        </p>
+      } @else {
+        <p class="text-sm text-slate-500">
+          Jouez un coup pour lancer l'analyse.
+        </p>
+      }
+    }
+  </section>
+
+  <section class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div class="mb-2 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <h3 class="text-sm font-semibold text-slate-900">Coups suggérés</h3>
+        @if (state.moves.data; as moves) {
+          @if (moves.theoretical) {
+            <span
+              class="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-medium text-emerald-700"
+              title="Ce coup fait partie de la théorie d'ouverture connue"
+            >
+              Théorie
+            </span>
+          } @else {
+            <span
+              class="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-700"
+              title="Position hors théorie : l'agent n'a plus de référence dans la base de parties"
+            >
+              Hors théorie
+            </span>
+          }
+        }
+      </div>
+      <span class="text-[11px] font-medium uppercase tracking-wide text-slate-400"
+        >Source : Lichess</span
+      >
+    </div>
+
+    @if (state.moves.loading) {
+      <div class="flex animate-pulse flex-col gap-2">
+        <div class="h-4 w-1/3 rounded bg-slate-200"></div>
+        <div class="h-6 w-full rounded bg-slate-200"></div>
+        <div class="h-6 w-full rounded bg-slate-200"></div>
+      </div>
+    } @else if (state.moves.error) {
+      <div class="flex items-center justify-between gap-2">
+        <p class="text-sm text-red-600">{{ state.moves.error }}</p>
+        <button
+          type="button"
+          (click)="retry.emit()"
+          class="shrink-0 rounded-lg border border-red-300 bg-red-50 px-2 py-1 text-xs font-medium text-red-700 transition hover:bg-red-100"
+        >
+          Réessayer
+        </button>
+      </div>
+    } @else {
+      @if (state.moves.data; as moves) {
+        @if (moves.opening?.name) {
+          <p class="mb-2 font-medium text-slate-800">
+            {{ moves.opening?.name }}
+          </p>
+        }
+        @if (moves.moves.length) {
+          <ul class="flex flex-col gap-2">
+            @for (move of moves.moves; track move.uci) {
+              <li class="grid grid-cols-[auto_1fr_auto] items-center gap-2">
+                <button
+                  type="button"
+                  (click)="playMove.emit(move.uci!)"
+                  class="rounded-lg border border-emerald-600 bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700 transition hover:bg-emerald-100"
+                >
+                  {{ move.san }}
+                </button>
+                <div class="flex h-2 overflow-hidden rounded-full bg-slate-200">
+                  <span
+                    class="bg-emerald-500"
+                    [style.width.%]="winRate(move)"
+                  ></span>
+                  <span
+                    class="bg-slate-300"
+                    [style.width.%]="drawRate(move)"
+                  ></span>
+                  <span
+                    class="bg-red-500"
+                    [style.width.%]="lossRate(move)"
+                  ></span>
+                </div>
+                <span class="whitespace-nowrap text-xs text-slate-500"
+                  >{{ move.games }} parties</span
+                >
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="text-sm text-slate-500">
+            Position hors théorie connue : aucun coup référencé dans la base
+            Lichess pour cette position, l'agent s'appuie uniquement sur
+            Stockfish à partir d'ici.
+          </p>
+        }
+      } @else {
+        <p class="text-sm text-slate-500">
+          Jouez un coup pour voir la théorie d'ouverture.
+        </p>
+      }
+    }
+  </section>
+
+  <section class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div class="mb-2 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <h3 class="text-sm font-semibold text-slate-900">Explication de l'agent</h3>
+        @if (state.moves.data; as moves) {
+          @if (moves.opening?.name) {
+            <span
+              class="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-medium text-emerald-700"
+              title="L'agent a identifie une ouverture nommee et interroge Wikichess/YouTube"
+            >
+              Ouverture connue
+            </span>
+          } @else {
+            <span
+              class="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-700"
+              title="Aucune ouverture nommee identifiee : l'agent n'interroge pas Wikichess/YouTube"
+            >
+              Ouverture inconnue
+            </span>
+          }
+        }
+      </div>
+      <span class="text-[11px] font-medium uppercase tracking-wide text-slate-400"
+        >Source : RAG · Mistral</span
+      >
+    </div>
+
+    @if (state.answer.loading) {
+      <div class="flex animate-pulse flex-col gap-2">
+        <div class="h-3 w-full rounded bg-slate-200"></div>
+        <div class="h-3 w-5/6 rounded bg-slate-200"></div>
+        <div class="h-3 w-2/3 rounded bg-slate-200"></div>
+      </div>
+    } @else if (state.answer.error) {
+      <div class="flex items-center justify-between gap-2">
+        <p class="text-sm text-red-600">{{ state.answer.error }}</p>
+        <button
+          type="button"
+          (click)="retry.emit()"
+          class="shrink-0 rounded-lg border border-red-300 bg-red-50 px-2 py-1 text-xs font-medium text-red-700 transition hover:bg-red-100"
+        >
+          Réessayer
+        </button>
+      </div>
+    } @else if (state.answer.text) {
+      <div
+        class="markdown-body text-sm leading-relaxed text-slate-700"
+        [innerHTML]="state.answer.text | markdown"
+      ></div>
+      @if (state.answer.streaming) {
+        <span class="ml-0.5 inline-block h-3.5 w-1.5 animate-pulse bg-slate-400 align-middle"></span>
+      }
+    } @else {
+      <p class="text-sm text-slate-500">
+        L'explication s'affiche dès qu'une ouverture est identifiée.
+      </p>
+    }
+  </section>
+
+  <section class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div class="mb-2 flex items-center justify-between">
+      <h3 class="text-sm font-semibold text-slate-900">Vidéos</h3>
+      <span class="text-[11px] font-medium uppercase tracking-wide text-slate-400"
+        >Source : YouTube</span
+      >
+    </div>
+
+    @if (state.context.loading) {
+      <div class="flex animate-pulse gap-3">
+        <div class="h-16 w-28 shrink-0 rounded-lg bg-slate-200"></div>
+        <div class="flex flex-1 flex-col gap-2">
+          <div class="h-3 w-full rounded bg-slate-200"></div>
+          <div class="h-3 w-1/2 rounded bg-slate-200"></div>
+        </div>
+      </div>
+    } @else if (state.context.error) {
+      <div class="flex items-center justify-between gap-2">
+        <p class="text-sm text-red-600">{{ state.context.error }}</p>
+        <button
+          type="button"
+          (click)="retry.emit()"
+          class="shrink-0 rounded-lg border border-red-300 bg-red-50 px-2 py-1 text-xs font-medium text-red-700 transition hover:bg-red-100"
+        >
+          Réessayer
+        </button>
+      </div>
+    } @else {
+      @if (state.context.data; as context) {
+        @if (context.videos.length) {
+          <ul class="flex flex-col gap-3">
+            @for (video of context.videos; track video.video_id) {
+              <li class="flex gap-3">
+                @if (video.thumbnail_url) {
+                  <a
+                    [href]="video.url"
+                    target="_blank"
+                    rel="noopener"
+                    class="shrink-0"
+                  >
+                    <img
+                      [src]="video.thumbnail_url"
+                      [alt]="video.title"
+                      class="h-16 w-28 rounded-lg object-cover"
+                    />
+                  </a>
+                }
+                <div class="min-w-0">
+                  <a
+                    [href]="video.url"
+                    target="_blank"
+                    rel="noopener"
+                    class="line-clamp-2 text-sm font-medium text-emerald-700 hover:underline"
+                  >
+                    {{ video.title }}
+                  </a>
+                  @if (video.channel) {
+                    <p class="mt-1 truncate text-xs text-slate-500">
+                      {{ video.channel }}
+                    </p>
+                  }
+                </div>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="text-sm text-slate-500">
+            Aucune vidéo trouvée pour cette ouverture.
+          </p>
+        }
+      } @else {
+        <p class="text-sm text-slate-500">
+          Les vidéos s'affichent dès qu'une ouverture est identifiée.
+        </p>
+      }
+    }
+  </section>
+</div>

@@ -1,0 +1,35 @@
+<div class="min-h-screen bg-slate-50">
+  <header class="border-b border-slate-200 bg-white">
+    <div class="mx-auto max-w-6xl px-6 py-5">
+      <h1 class="text-xl font-bold text-slate-900">Assistant d'échecs IA</h1>
+      <p class="text-sm text-slate-500">
+        Jouez un coup et laissez l'agent analyser la position, suggérer la théorie
+        d'ouverture et le contexte associé.
+      </p>
+    </div>
+  </header>
+
+  @if (isLoading) {
+    <div class="h-0.5 w-full overflow-hidden bg-emerald-100">
+      <div class="h-full w-1/3 animate-loading-bar bg-emerald-500"></div>
+    </div>
+  }
+
+  <div class="mx-auto max-w-6xl px-6 pt-6">
+    <app-agent-steps [steps]="state.steps" [streaming]="state.streamingSteps"></app-agent-steps>
+  </div>
+
+  <main class="mx-auto flex max-w-6xl flex-wrap items-start justify-center gap-8 px-6 py-8">
+    <app-chessboard
+      #chessboard
+      [disabled]="isLoading"
+      (fenChange)="onFenChange($event)"
+    ></app-chessboard>
+
+    <app-recommendations-panel
+      [state]="state"
+      (playMove)="chessboard.playMove($event)"
+      (retry)="onRetry()"
+    ></app-recommendations-panel>
+  </main>
+</div>
