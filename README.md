@@ -158,6 +158,7 @@ complète sur `/docs`) :
   les optimisations apportées à la recherche vectorielle ainsi que les
   mesures avant/après.
 - [docs/etude_faisabilite_analyse_video.md](docs/etude_faisabilite_analyse_video.md)
-  est une étude de faisabilité sur l'architecture, les bénéfices, les limites
-  et les coûts d'une extension du RAG à l'analyse du contenu des vidéos,
-  au-delà des seules métadonnées YouTube utilisées aujourd'hui.
+  est une étude de faisabilité (conception uniquement, non implémentée) sur un
+  système de recherche de position exacte dans les vidéos : extraction de
+  frames, détection d'échiquier, conversion en FEN par vision par ordinateur,
+  et exposition via un serveur MCP.
